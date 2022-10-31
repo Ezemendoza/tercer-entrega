@@ -1,0 +1,29 @@
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Nombre</th>
+      <th scope="col">Talle</th>
+      <th scope="col">ID</th>
+      <th scope="col">Agregado Por:</th>
+    </tr>
+  </thead>
+  <tbody>
+       {{#each data}}
+            <tr class="tabla">
+        
+                <td>{{nombre}}</td>
+                <td>{{talle}}</td>
+                <td>{{id}}</td>
+                <td>{{agregado}}</td>
+               
+            </tr>
+       {{/each}}
+    </tbody>
+</table>
+
+         <style>
+          .table{width: 60%;
+           margin-left: 350px;
+          }
+         </style>
+

@@ -1,0 +1,77 @@
+ <div class="d-flex flex-column justify-content-center  flex-wrap align-items-center mt-3">
+
+        <h1>¡Bienvenido {{datos.email}}!</h1>
+            <h1>My Chat App</h1>
+    <div id="listaProductos"></div>
+    
+  <div class="sub-filas">
+
+    <h4>Agregar Producto</h4>
+    <form onsubmit="return agregarMensaje(this)">
+      <input type="text" id="talle" placeholder="Talle" />
+      <input type="submit" value="Agregar" class="btn btn-success"/>
+    </form>
+    </div>
+
+    <div>
+        <h4>Bandeja de entradas</h4>
+        <div id="mensajes"> </div>
+        
+        <form onsubmit="return agregarMensaje(this)">
+          <input type="text" id="autor" placeholder="Nombre" />
+          <input type="text" id="texto" placeholder="Texto" />
+          <input type="submit" value="Enviar" class="btn btn-success"/>
+        </form>
+        </div>
+    </div>
+    <table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Nombre</th>
+      <th scope="col">Talle</th>
+      <th scope="col">ID</th>
+      <th scope="col">Agregado Por:</th>
+    </tr>
+  </thead>
+  <tbody>
+       {{#each data}}
+            <tr class="tabla">
+        
+                <td>{{nombre}}</td>
+                <td>{{talle}}</td>
+                <td>{{id}}</td>
+                <td>{{agregado}}</td>
+               
+            </tr>
+       {{/each}}
+    </tbody>
+</table>
+  {{#each info}}
+  <div class="columna-mensaje"> 
+
+
+            <div class="col-8">
+                <strong>{{autor}} : </strong> {{texto}}
+                </div>
+            <div class="col-4">
+                 <span class="text-muted">{{horario}}</span>  
+            </div>
+    </div>
+       {{/each}}
+
+<style>
+.columna-mensaje{
+display: flex;
+flex-direction: row;
+
+}
+</style>
+         <style>
+          .table{width: 60%;
+           margin-left: 350px;
+          }
+         </style>
+
+
+                <button class="btn btn-danger mt-4" > <a href="http://localhost:8080/logout" class="text-white">Abandonar sesion</a></button>
+ </div>

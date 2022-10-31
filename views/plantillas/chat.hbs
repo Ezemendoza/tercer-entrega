@@ -1,0 +1,20 @@
+  {{#each info}}
+  <div class="columna-mensaje"> 
+
+
+            <div class="col-8">
+                <strong>{{autor}} : </strong> {{texto}}
+                </div>
+            <div class="col-4">
+                 <span class="text-muted">{{horario}}</span>  
+            </div>
+    </div>
+       {{/each}}
+
+<style>
+.columna-mensaje{
+display: flex;
+flex-direction: row;
+
+}
+</style>
