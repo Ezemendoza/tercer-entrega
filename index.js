@@ -9,17 +9,30 @@ import { Strategy } from "passport-local";
 import path from "path";
 import "./db/config.js"
 import {auth} from "./middleware/auth.js"
-import compression from "compression";
-import  Log4js  from "log4js";
-import { Server as HTTPSServer } from "https";
-import { Server as IOServer } from "socket.io";
+import nodemailer from "nodemailer"
+
 const LocalStrategy = Strategy;
 const app = express();
 
-const httpServer = new HTTPSServer(app);
-const io = new IOServer(httpServer);
-app.use(express.static("public"));
-app.use(compression());
+enviarMail =async (email)=>{
+  const config = {
+    host:"smtp.gmail.com",
+    port:"587",
+    auth:{
+      user:"ezequielmendoza99@gmail.com",
+      pass:"qrgyujtzixarpthz"
+    }
+  }
+  const mensaje = {
+    from:"ezequielmendoza99@gmail.com",
+    to:"ezequielmendoza99@gmail.com",
+    subject:"Nuevo registro",
+    text :`Se creo una nueva cuenta con el mail ${email}`
+  }
+  const transport = nodemailer.createTransport(config);
+
+  const info = await transport.sendMail(mensaje)
+}
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -36,19 +49,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-Log4js.configure({
-  appenders: {
-    miLoggerConsole: { type: "console" },
-    warn: { type: "file", filename: "warn.log" },
-    error: { type: "file", filename: "error.log" },
-  },
-  categories: {
-    default: { appenders: ["warn"], level: "warn" },
-    info: { appenders: ["miLoggerConsole"], level: "info" },
-    warn: { appenders: ["miLoggerConsole","warn"], level: "warn" },
-    error: { appenders: ["miLoggerConsole", "error"], level: "error" },
-  },
-});
 
 passport.use(new LocalStrategy({ usernameField: 'email',passwordField: 'password'},function(email, password, done) {
   
@@ -99,34 +99,33 @@ app.engine(
 app.get("/register",(req,res)=>{
   res.render("register")
 })
+
 app.post("/register", (req,res)=>{
-  const { email , password} = req.body
+
+  const { email , password, nombre,direccion,edad,phone,  image} = req.body
   User.findOne({email}, async (err, user)=>{
 
     if(err) console.log(err);
-    if(user) {
-
-    const loggerArchivo = Log4js.getLogger("info");
-    loggerArchivo.info(`Error de registro`);
-    res.render("register-error") }
+    if(user) res.render("register-error")
     if(!user){
       const hashedPass= await bcrypt.hash(password, 8)
       const newUser = new User({
-        email, 
-        password:hashedPass
+        email:email, 
+        password:hashedPass,
+        nombre:nombre,
+        direccion:direccion,
+        edad:edad,
+        phone:phone,
+        image:image
       })
-      const loggerArchivo = Log4js.getLogger("info");
-    loggerArchivo.info(`Ha iniciado sesion`);
+
       await newUser.save()
+      enviarMail(email)
       res.redirect("login")
     }
   })
 })
 app.get("/loginerror", (req, res) => {
-  
-const loggerArchivo = Log4js.getLogger("info");
-loggerArchivo.info(`Error en el login`);
-
   res.render("loginerror");
 });
 
@@ -135,8 +134,6 @@ app.get("/login", (req,res)=>{
 })
 app.post( "/login", passport.authenticate("local", { failureRedirect: "loginerror" }), (req, res) => {
 
-  const loggerArchivo = Log4js.getLogger("info");
-    loggerArchivo.info(`Logueado`);
     res.redirect("inicio");
   }
 );
@@ -145,48 +142,12 @@ app.post( "/login", passport.authenticate("local", { failureRedirect: "loginerro
 app.get("/inicio", auth, async (req,res)=>{
 
       const datosUsuario = await User.findById(req.user._id).lean()
-      const loggerArchivo = Log4js.getLogger("info");
-      loggerArchivo.info(`Inicio de sesion`);
-     
-const listaProducto = [  ]
-
-const mensajes = []
-
-io.on("connection", function (socket) {
-
-  socket.emit("listaProducto", listaProducto);
-
-  socket.emit("mensaje", mensajes);
-
-  socket.on("mensaje", (info) => {
-
-    const loggerArchivo = Log4js.getLogger("error");
-    loggerArchivo.error(`${info}`);
-    mensajes.push(info);
-    io.sockets.emit("mensaje", mensajes);
-  });
-
-  socket.on("new-listaProducto", (data) => {
-    const loggerArchivo = Log4js.getLogger("error");
-    loggerArchivo.error(`${data}`);
-    listaProducto.push(data);
-   agregarProductos(listaProducto)
-
-    io.sockets.emit("listaProducto", listaProducto);
-  });
-});
 
       res.render("inicio",{datos:datosUsuario})
     
 })
 
-app.get("*", (req, res) => {
-  const { url} = req;
 
-const loggerArchivo = Log4js.getLogger("warn");
-  loggerArchivo.warn(`Ruta ${url} inexistente`);
-  res.send(`Ruta ${url} inexistente`);
-});
 
 
 
@@ -197,16 +158,13 @@ app.get("/logout",(req,res)=>{
       return next(err)
     }
     res.redirect("login")
-    const loggerArchivo = Log4js.getLogger("info");
-    loggerArchivo.info(`Deslogueado`);
   })
     
         })
 
 
-        
 
-app.listen(8081)
+app.listen(8080)
 
 
 
