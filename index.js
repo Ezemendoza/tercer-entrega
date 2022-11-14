@@ -21,6 +21,7 @@ const LocalStrategy = Strategy;
 const app = express();
 const navbar = Handlebars.compile('./views/navbar.hbs').toString('utf-8');
 Handlebars.registerPartial('navbar', navbar);
+
 const enviarMail =async (email)=>{
   const config = {
     host:"smtp.gmail.com",
@@ -41,6 +42,41 @@ const enviarMail =async (email)=>{
   const info = await transport.sendMail(mensaje)
 }
 
+const compraMail =async (productos,datos)=>{
+  try {
+    const message = await client.messages.create({
+      body:`Se realizo una compra con el email ${datos.email} a entregar a ${datos.direccion}, los productos que se compro fue ${productos.titulo} con ${productos.cantidad}  a ${productos.precio} c/u`, 
+      from: 'whatsapp:+14155238886',    
+      to: 'whatsapp:+5491121664682',
+    });
+    console.log(message);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+const compraUser =async (productos,datos)=>{
+
+  const config = {
+    host:"smtp.gmail.com",
+    port:"587",
+    auth:{
+      user:"ezequielmendoza99@gmail.com",
+      pass:"qrgyujtzixarpthz"
+    }
+  }
+  const mensaje = {
+    from:"ezequielmendoza99@gmail.com",
+    to:"ezequielmendoza99@gmail.com",
+    subject:"Nuevo compra",
+    text :`Se realizo una compra con el email ${datos.email} a entregar a ${datos.direccion}, los productos que se compro fue ${productos.titulo} con ${productos.cantidad}  a ${productos.precio} c/u`
+  }
+  const transport = nodemailer.createTransport(config);
+
+  const info = await transport.sendMail(mensaje)
+}
+
 const enviarwhatsapp =async (email)=>{
   try {
     const message = await client.messages.create({
@@ -53,8 +89,6 @@ const enviarwhatsapp =async (email)=>{
     console.log(error);
   }
 }
-
-
  let carrito= []
 
 app.use(express.json());
@@ -171,7 +205,7 @@ app.get("/inicio",
 auth,
  async (req,res)=>{
   let registros = await Productos.find().lean()
-  
+
     const datosUsuario = await User.findById(req.user._id).lean()
       res.render("inicio",
       {
@@ -183,18 +217,43 @@ auth,
 app.post("/inicio", 
 
  async (req,res)=>{
-
+  console.log(req)
       res.render("inicio",
       {
         datos:datosUsuario, 
         productos:registros})
 })
 
-app.get("/carrito", 
+app.get("/:navbar", 
 
 auth,
  async (req,res)=>{
-  console.log(carrito)
+  const si = await Productos.find(
+    { categoria: "celulares" }
+).lean()
+const dale = si.filter(el=>el.categoria === req.params.navbar)
+    const datosUsuario = await User.findById(req.user._id).lean()
+res.render("inicio",
+{
+  datos:datosUsuario, 
+  productos:dale})
+
+    
+})
+
+
+app.post("/:navbar", 
+
+auth,
+ async (req,res)=>{
+console.log(req.params.navbar)
+
+    
+})
+app.get("/checkout/carrito", 
+auth,
+ async (req,res)=>{
+
     const datosUsuario = await User.findById(req.user._id).lean()
       res.render("carrito",
       {
@@ -204,16 +263,21 @@ auth,
 })
 
 
-app.post("/carrito", 
-
+app.post("/checkout/carrito", 
 auth,
  async (req,res)=>{
+  console.log(carrito)
 carrito.push(req.body)
   console.log(req.body)
-
-    
 })
 
+app.post("/checkout/carrito/finalizar", 
+auth,
+ async (req,res)=>{
+  const datosUsuario = await User.findById(req.user._id).lean()
+compraMail(req.body,datosUsuario)
+compraUser(req.body,datosUsuario)
+})
 
 app.get("/logout",(req,res)=>{
   req.logout(function(err){

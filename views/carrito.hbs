@@ -1,4 +1,4 @@
-<section class="header-main border-bottom bg-white">
+<section class="header-main border-bottom bg-white container">
 	<div class="container-fluid">
                 {{#each productos}}
        <div class="row p-2 pt-3 pb-3 d-flex align-items-center">
@@ -14,12 +14,30 @@
                         <h5 class="card-title">{{this.titulo}}</h5>
                         <h4 class="card-title">{{this.precio}}</h4>
                         <p class="card-title">{{this.cantidad}}</p>
-                        <button href="#" class="btn btn-primary compra" onclick={editEvent()}>Agregar al carrito</button>
+                     
                     </div>
+         
                 </div>
             </div>
      
        </div>
               {{/each}}
-	</div> 
+	</div>
+                  <button href="#" class="btn btn-primary compra" onclick={editEvent({event})}>Finalizar compra</button> 
 </section>
+
+<script>
+const editEvent=(productos)=>{
+
+let data = {imagen: productos.event.path[2].children[0].src, cantidad:productos.event.path[1].children[2], precio:productos.event.path[1].children[1].textContent, titulo: productos.event.path[1].children[0].textContent};
+const response = fetch("/checkout/carrito/finalizar", {
+method: 'POST',
+headers: {
+  'Accept': 'application/json',
+  'Content-Type': 'application/json'
+},
+body: JSON.stringify(data)
+});
+}
+
+</script>

@@ -5,7 +5,7 @@
 
 <section class="header-main border-bottom bg-white">
 	<div class="container-fluid">
-       <div class="row p-2 pt-3 pb-3 d-flex align-items-center">
+       <div class="row p-2 pt-3 pb-3 d-flex align-items-center justify-content-around">
          {{#each productos}}
             <div class="col-md-3 " >
                 <div class="card tarjeta" style="width: 18rem;">
@@ -33,7 +33,7 @@
 
 const editEvent=(productos)=>{
 let data = {imagen: productos.event.path[2].children[0].src, cantidad:productos.event.path[1].children[2].value, precio:productos.event.path[1].children[1].textContent, titulo: productos.event.path[1].children[0].textContent};
-const response = fetch("/carrito", {
+const response = fetch("/checkout/carrito", {
 method: 'POST',
 headers: {
   'Accept': 'application/json',
