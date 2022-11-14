@@ -1,0 +1,25 @@
+<section class="header-main border-bottom bg-white">
+	<div class="container-fluid">
+                {{#each productos}}
+       <div class="row p-2 pt-3 pb-3 d-flex align-items-center">
+ 
+            <div class="col-md-3 " >
+                <div class="card tarjeta" style="width: 18rem;">
+                    <img class="card-img-top"
+                        src="{{imagen}}"
+                        width="200"
+                        height="200"
+                        alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">{{this.titulo}}</h5>
+                        <h4 class="card-title">{{this.precio}}</h4>
+                        <p class="card-title">{{this.cantidad}}</p>
+                        <button href="#" class="btn btn-primary compra" onclick={editEvent()}>Agregar al carrito</button>
+                    </div>
+                </div>
+            </div>
+     
+       </div>
+              {{/each}}
+	</div> 
+</section>

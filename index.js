@@ -55,7 +55,7 @@ const enviarwhatsapp =async (email)=>{
 }
 
 
- 
+ let carrito= []
 
 app.use(express.json());
 app.use(cookieParser());
@@ -158,23 +158,61 @@ app.get("/loginerror", (req, res) => {
 app.get("/login", (req,res)=>{
     res.render("login")
 })
-app.post( "/login", passport.authenticate("local", { failureRedirect: "loginerror" }), (req, res) => {
+app.post( "/login", 
+passport.authenticate("local", { failureRedirect: "loginerror" }), 
+(req, res) => {
 
     res.redirect("inicio");
   }
 );
 
 
-app.get("/inicio", auth,
+app.get("/inicio", 
+auth,
  async (req,res)=>{
-  let registros = await Productos.find()
+  let registros = await Productos.find().lean()
+  
     const datosUsuario = await User.findById(req.user._id).lean()
-      res.render("inicio",{datos:datosUsuario, productos:registros})
+      res.render("inicio",
+      {
+        datos:datosUsuario, 
+        productos:registros})
+})
+
+
+app.post("/inicio", 
+
+ async (req,res)=>{
+
+      res.render("inicio",
+      {
+        datos:datosUsuario, 
+        productos:registros})
+})
+
+app.get("/carrito", 
+
+auth,
+ async (req,res)=>{
+  console.log(carrito)
+    const datosUsuario = await User.findById(req.user._id).lean()
+      res.render("carrito",
+      {
+        datos:datosUsuario, 
+        productos:carrito})
     
 })
 
 
+app.post("/carrito", 
 
+auth,
+ async (req,res)=>{
+carrito.push(req.body)
+  console.log(req.body)
+
+    
+})
 
 
 app.get("/logout",(req,res)=>{

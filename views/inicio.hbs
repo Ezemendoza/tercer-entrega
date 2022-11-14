@@ -7,14 +7,18 @@
 	<div class="container-fluid">
        <div class="row p-2 pt-3 pb-3 d-flex align-items-center">
          {{#each productos}}
-            <div class="col-md-3">
-                <div class="card" style="width: 18rem;">
+            <div class="col-md-3 " >
+                <div class="card tarjeta" style="width: 18rem;">
                     <img class="card-img-top"
                         src="{{image}}"
+                        width="200"
+                        height="200"
                         alt="Card image cap">
                     <div class="card-body">
-                        <h5 class="card-title"></h5>
-                        <a href="#" class="btn btn-primary">Add to Cart</a>
+                        <h5 class="card-title">{{this.nombre}}</h5>
+                        <h4 class="card-title">$ {{this.precio}}</h4>
+                        <input type="number" class="cant" required>
+                        <button href="#" class="btn btn-primary compra" onclick={editEvent({event})}>Agregar al carrito</button>
                     </div>
                 </div>
             </div>
@@ -24,4 +28,19 @@
 </section>
 
  </div>
+<script>
 
+
+const editEvent=(productos)=>{
+let data = {imagen: productos.event.path[2].children[0].src, cantidad:productos.event.path[1].children[2].value, precio:productos.event.path[1].children[1].textContent, titulo: productos.event.path[1].children[0].textContent};
+const response = fetch("/carrito", {
+method: 'POST',
+headers: {
+  'Accept': 'application/json',
+  'Content-Type': 'application/json'
+},
+body: JSON.stringify(data)
+});
+}
+
+</script>
