@@ -168,7 +168,7 @@ app.post( "/login", passport.authenticate("local", { failureRedirect: "loginerro
 app.get("/inicio", auth,
  async (req,res)=>{
   let registros = await Productos.find()
-
+    const datosUsuario = await User.findById(req.user._id).lean()
       res.render("inicio",{datos:datosUsuario, productos:registros})
     
 })
