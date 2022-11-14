@@ -1,5 +1,27 @@
+
  <div class="d-flex flex-column justify-content-center  flex-wrap align-items-center mt-3">
 
-        <h1>¡Bienvenido {{datos.email}}!</h1>
-                <button class="btn btn-danger mt-4" > <a href="http://localhost:8080/logout" class="text-white">Abandonar sesion</a></button>
+        <h1>¡Bienvenido {{datos.email}}!</h1> 
+
+<section class="header-main border-bottom bg-white">
+	<div class="container-fluid">
+       <div class="row p-2 pt-3 pb-3 d-flex align-items-center">
+         {{#each productos}}
+            <div class="col-md-3">
+                <div class="card" style="width: 18rem;">
+                    <img class="card-img-top"
+                        src="{{image}}"
+                        alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title"></h5>
+                        <a href="#" class="btn btn-primary">Add to Cart</a>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+       </div>
+	</div> 
+</section>
+
  </div>
+

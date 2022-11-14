@@ -25,10 +25,13 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  image:  {
-    data: Buffer,
-    contentType: String
-}
+
 });
+const productoSchema= new mongoose.Schema({
+  nombre:{type: String},
+  apellido:{type:String}})
+
+
+export const Productos = mongoose.model("Productos" , productoSchema)
 
 export default mongoose.model("User", UserSchema);

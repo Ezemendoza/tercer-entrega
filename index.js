@@ -2,7 +2,7 @@ import cookieParser from "cookie-parser"
 import express from "express"
 import handlebars from"express-handlebars"
 import passport from "passport";
-import User from "./src/models/User.js"
+import User, { Productos } from "./src/models/User.js"
 import session from "express-session"
 import bcrypt from "bcrypt"
 import { Strategy } from "passport-local";
@@ -10,11 +10,18 @@ import path from "path";
 import "./db/config.js"
 import {auth} from "./middleware/auth.js"
 import nodemailer from "nodemailer"
+import twilio from "twilio";
+import Handlebars from "handlebars"
+import multer from "multer";
 
+const accountSid = 'AC4a8038a29096cdb228cdeb74b95a12e7'; 
+const authToken = 'b08513e286ea6feca9c9e6dfbdc09c9e'; 
+const client = twilio(accountSid, authToken);
 const LocalStrategy = Strategy;
 const app = express();
-
-enviarMail =async (email)=>{
+const navbar = Handlebars.compile('./views/navbar.hbs').toString('utf-8');
+Handlebars.registerPartial('navbar', navbar);
+const enviarMail =async (email)=>{
   const config = {
     host:"smtp.gmail.com",
     port:"587",
@@ -33,6 +40,23 @@ enviarMail =async (email)=>{
 
   const info = await transport.sendMail(mensaje)
 }
+
+const enviarwhatsapp =async (email)=>{
+  try {
+    const message = await client.messages.create({
+      body: `Se creo una nueva cuenta con el siguiente mail: ${email}`, 
+      from: 'whatsapp:+14155238886',    
+      to: 'whatsapp:+5491121664682',
+    });
+    console.log(message);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+ 
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -103,6 +127,7 @@ app.get("/register",(req,res)=>{
 app.post("/register", (req,res)=>{
 
   const { email , password, nombre,direccion,edad,phone,  image} = req.body
+  console.log(image)
   User.findOne({email}, async (err, user)=>{
 
     if(err) console.log(err);
@@ -121,6 +146,7 @@ app.post("/register", (req,res)=>{
 
       await newUser.save()
       enviarMail(email)
+      enviarwhatsapp(email)
       res.redirect("login")
     }
   })
@@ -139,14 +165,13 @@ app.post( "/login", passport.authenticate("local", { failureRedirect: "loginerro
 );
 
 
-app.get("/inicio", auth, async (req,res)=>{
+app.get("/inicio", auth,
+ async (req,res)=>{
+  let registros = await Productos.find()
 
-      const datosUsuario = await User.findById(req.user._id).lean()
-
-      res.render("inicio",{datos:datosUsuario})
+      res.render("inicio",{datos:datosUsuario, productos:registros})
     
 })
-
 
 
 
