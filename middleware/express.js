@@ -49,7 +49,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser(async (id, done) => {
-  const user = getDateId(id);
+  const user = await User.findById(id).lean();
   return done(null, user);
 });
 
